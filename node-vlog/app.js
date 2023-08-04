@@ -16,6 +16,7 @@ app.use(cookieParser())
 app.use(express.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(
+
     session({
         secret: '123@123abc',
         resave: false,
@@ -32,7 +33,7 @@ app.post('/user_form', function (req, res, next) {
     var email = req.body.email
     var message = req.body.message
     var sql = `INSERT INTO usuarios (nome, email, mensagem, criado_em) VALUES
-        ("${name}", "${email}", "${message}", NOW())`
+("${name}", "${email}", "${message}", NOW())`
     db.query(sql, function (err, result) {
         if (err) throw err
         console.log('Registro atualizado')
