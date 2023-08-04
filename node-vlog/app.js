@@ -25,13 +25,20 @@ app.use(
     }),
 )
 app.use(flash())
+
 app.get('/', function (req, res, next) {
-    res.render('index', { title: 'User Form' })
-})
+    var sql = "SELECT * FROM usuarios"; // Consulta para buscar os dados no banco
+    db.query(sql, function (err, storedData) {
+        if (err) throw err;
+        res.render('index', { title: 'User Form', storedData: storedData });
+    });
+});
+
 app.post('/user_form', function (req, res, next) {
-    var name = req.body.name
+    var id = req.body.id
+    var name = req.body.nome
     var email = req.body.email
-    var message = req.body.message
+    var message = req.body.mensagem
     var sql = `INSERT INTO usuarios (nome, email, mensagem, criado_em) VALUES
 ("${name}", "${email}", "${message}", NOW())`
     db.query(sql, function (err, result) {
@@ -41,6 +48,23 @@ app.post('/user_form', function (req, res, next) {
         res.redirect('/')
     })
 })
+
+app.post('/delete_data', function (req, res, next) {
+    var dataId = req.body.dataId;
+
+    // Recuperar o ID do dado excluído (pode ser usado para outros fins, se necessário)
+    console.log('ID do dado excluído:', dataId);
+
+    // Depois de excluir o dado, o próximo ID será gerado automaticamente se estiver usando auto-incremento
+    var sqlDelete = `DELETE FROM usuarios WHERE id = ${dataId}`;
+    db.query(sqlDelete, function (err, result) {
+        if (err) throw err;
+        console.log('Registro excluído');
+        req.flash('success', 'Dado excluído!');
+        res.redirect('/');
+    });
+});
+
 app.use(function (req, res, next) {
     next(createError(404))
 })
